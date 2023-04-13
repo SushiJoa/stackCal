@@ -101,7 +101,7 @@ int prec(const char* op) {
 	return 0;
 }
 // 문자열 표준화 함수	ex)"2.13 ", "+ ", "132 "
-char * set_std_space(char* str)	//p1->array, str->p1
+char* set_std_space(char* str)	//p1->array, str->p1
 {
 	int len;
 	char* temp = (char*)malloc(strlen(str) * 2 + 1);
@@ -114,8 +114,8 @@ char * set_std_space(char* str)	//p1->array, str->p1
 		token = get_token(str);
 	}
 	len = strlen(temp);
-	str = (char*)realloc(str, len+1);
-	strncpy(str, temp, len+1);
+	str = (char*)realloc(str, len + 1);
+	strncpy(str, temp, len + 1);
 	free(temp);
 	return str;
 }
@@ -144,7 +144,7 @@ element get_token(const char* in)
 			p[i] = in[firstIdx];
 		}
 		p[i] = ' ';
-		p[i+1] = '\0';
+		p[i + 1] = '\0';
 	}
 	else {
 		p = (char*)malloc(3);
@@ -199,7 +199,7 @@ int is_op_num_correct(char* in)
 	while (token != NULL) {
 		if (isdigit(token[0]))
 			count_num++;
-		else if(prec(token) == 2 || prec(token) == 3)
+		else if (prec(token) == 2 || prec(token) == 3)
 			count_op++;
 		token = get_token(in);
 	}
@@ -221,7 +221,7 @@ element double_to_token(double num)
 	char* temp = (char*)malloc(100);
 	int len;
 
-	if (num != 0) 
+	if (num != 0)
 		sprintf(temp, "%lf", num);
 	len = strlen(temp);
 	token = (char*)malloc(len + 1);
@@ -241,7 +241,7 @@ int return_expr_type(const char* in)	// 전위, 중위, 후위식일 경우 각각 1, 2, 3을
 	while (token != NULL) {
 		if (prec(token) == 1)	// (, )일 경우
 			is_infix = 1;
-		if (prec(token) == 2 || prec(token) == 3)	// +, -, *, /, 일 경우
+		if (prec(token) == 2 || prec(token) == 3)	// +, -, *, /, 일 경우			 123.34+12-3/4
 			is_postfix = 1;
 		else
 			is_postfix = 0;
@@ -249,23 +249,13 @@ int return_expr_type(const char* in)	// 전위, 중위, 후위식일 경우 각각 1, 2, 3을
 		token = get_token(in);
 	}
 	free(token);
-	if (!is_infix && !is_postfix)
-		return 1;
-	if (!is_prefix && is_infix && !is_postfix)
+
+	if (!is_prefix && !is_postfix)
 		return 2;
-	 
-	if (is_prefix) {
-		if (!is_infix && !is_postfix)
-			return 1;
-		else
-			return 0;
-	}
-	else {
-		if (is_infix && !is_postfix)
-			return 2;
-		else if (!is_infix && is_postfix)
-			return 3;
-	}
+	if (is_prefix && !is_infix && !is_postfix)
+		return 1;
+	if (!is_prefix && !is_infix && is_postfix)
+		return 3;
 	return 0;
 }
 
@@ -279,7 +269,7 @@ char* infix_to_postfix(const char* exp)		// (235 + 5.2768)* 34 *    (2 +100)
 	char* temp = (char*)malloc(strlen(exp) * 2);
 	StackType s;
 	init_stack(&s); // 스택 초기화
-	
+
 	temp[0] = '\0';
 
 	//for (i = 0; i < len; i++)
@@ -447,11 +437,11 @@ char* reverse_str(const char* str)
 char* prefix_to_infix(const char* exp)
 {
 	StackType s;
-	char* token, * exp_reverse, * op1, * op2, *temp;
+	char* token, * exp_reverse, * op1, * op2, * temp;
 	int len;
-	
+
 	init_stack(&s);
-	
+
 	exp_reverse = reverse_str(exp);
 
 	token = get_token(exp_reverse);
@@ -460,7 +450,7 @@ char* prefix_to_infix(const char* exp)
 		case '+': case '-': case '*': case '/': // 연산자
 			op1 = pop(&s);
 			op2 = pop(&s);
-			
+
 			temp = combine_3str_prec(op1, token, op2);
 			push(&s, temp);
 			break;
@@ -505,7 +495,7 @@ double eval(char* exp)
 	int len = strlen(exp);
 	double result, op1, op2;
 	char ch;
-	char* token, *tmp_1, *tmp_2;
+	char* token, * tmp_1, * tmp_2;
 	StackType s;
 	init_stack(&s);
 	//for (i = 0; i < len; i++)
@@ -521,7 +511,7 @@ double eval(char* exp)
 			op2 = token_to_double(tmp_1);
 			op1 = token_to_double(tmp_2);
 			switch (ch) { //연산을 수행하고 스택에 저장
-			case '+': 
+			case '+':
 				token = double_to_token(op1 + op2);
 				push(&s, token);
 				break;
@@ -557,20 +547,21 @@ double eval(char* exp)
 
 int main(void)
 {
-	char * p_input = create_expr();	//  (235 + 5.2768)* 34 *    (2 +100)     3 + 2
-	char* p_post, *p_pre, *p_in;
+	char* p_input = create_expr();	//  (235 + 5.2768)* 34 *    (2 +100)     3 + 2
+	char* p_post, * p_pre, * p_in;
 	int expr_type;
 	StackType s;
 	init_stack(&s);
 
 	p_input = set_std_space(p_input);
+	printf("%s \n", p_input);
 	// 식 검사
 	// 식 올바른지 검사 (+_* /.()숫자이외의 문자가 있는지)
 	if (check_opr_N_num(p_input) == 0) {
 		printf("올바르지않은 문자가 포함되어 있습니다.\n");
 		return 1;
 	}
-	// 피연산자 개수 = 연산자 개수+1인지 검사 
+	// 피연산자 개수 = 연산자 개수+1인지 검사					 123.34+12-3/4
 	if (is_op_num_correct(p_input) == 0) {
 		printf("연산자 피연산자 개수가 올바르지 않습니다.\n");
 		return 1;
@@ -615,8 +606,8 @@ int main(void)
 		break;
 	}
 	}
-	
-	 
+
+
 	return 0;
 }
 #endif
