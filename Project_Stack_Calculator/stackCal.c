@@ -62,8 +62,13 @@ element peek(StackType* s)
 	return rdata;
 }
 
-
 char* get_token(const char* in);
+
+
+
+
+
+
 
 // 입력값이 사칙연산인지 확인하는 함수
 int return_arith_type(const char* p) // +, -, *, / 일 경우 1 반환, // ( ,) 일 경우 2반환
@@ -258,7 +263,6 @@ int return_expr_type(const char* in)	// 전위, 중위, 후위식일 경우 각각 1, 2, 3을
 		return 3;
 	return 0;
 }
-
 
 //계산기 파트
 // 중위 표기 수식 -> 후위 표기 수식 변환
