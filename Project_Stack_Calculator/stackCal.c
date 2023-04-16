@@ -386,7 +386,7 @@ char* infix_to_postfix(char* exp)
 char* infix_to_prefix(char* exp)
 {
 	int len;	// 문자열의 길이를 담는 변수 선언
-	char* token, * op1, * op2, * p_prefix;// 문자열토큰을 받을 포인터변수, 연산자문자열을 받을 포인터변수, 변환된 문자열을 담을 포인터변수 선언
+	char* token, * op1, * op2, * p_prefix;	// 문자열토큰을 받을 포인터변수, 연산자문자열을 받을 포인터변수, 변환된 문자열을 담을 포인터변수 선언
 	StackType s_operand;	// 스택 선언
 	StackType s_operator;	// 스택 선언
 	init_stack(&s_operand); // 스택 초기화
@@ -404,235 +404,245 @@ char* infix_to_prefix(char* exp)
 		case '+': case '-': case '*': case '/': // 토큰의 첫문자가 사칙연산자일 경우
 			// 스택에 있는 연산자의 우선순위가 더 크거나 같은 동안 스택에 있는 데이터를 temp에 이어붙임			
 			while (!is_empty(&s_operator) && (prec(token) <= prec(peek(&s_operator)))) {
-				op2 = pop(&s_operand);
-				op1 = pop(&s_operand);
+				op2 = pop(&s_operand);	// 스택에서 꺼낸 피연산자를 op2에 대입
+				op1 = pop(&s_operand);	// 스택에서 꺼낸 피연산자를 op1에 대입
 
-				temp_op = combine_3str(pop(&s_operator), op1, op2);
-				push(&s_operand, temp_op);
+				temp_op = combine_3str(pop(&s_operator), op1, op2);	// 연산자 피연산자 피연산자 순으로 이어지는 문자열 만듦
+				push(&s_operand, temp_op);	// 문자열을 피연산자 스택에 삽입
 			}
-			push(&s_operator, token);
+			push(&s_operator, token);	// 토큰을 연산자 스택에 삽입
 			break;
 		case '(': // 왼쪽 괄호일 경우
-			push(&s_operator, token);
+			push(&s_operator, token);	// 토큰을 연산자 스택에 삽입
 			break;
 		case ')': // 오른쪽 괄호일 경우
-			token = pop(&s_operator);
+			token = pop(&s_operator);		// 연산자 스택에 토큰을 꺼냄
 			// 왼쪽 괄호를 만날때까지 스택에서 데이터를 꺼내 temp에 이어붙임
 			while (token[0] != '(') {
-				op2 = pop(&s_operand);
-				op1 = pop(&s_operand);
+				op2 = pop(&s_operand);	// 스택에서 꺼낸 피연산자를 op2에 대입
+				op1 = pop(&s_operand);	// 스택에서 꺼낸 피연산자를 op1에 대입
 
-				temp_op = combine_3str(token, op1, op2);
-				push(&s_operand, temp_op);
-				token = pop(&s_operator);
+				temp_op = combine_3str(token, op1, op2);	// 연산자 피연산자 피연산자 순으로 이어지는 문자열 만듦
+				push(&s_operand, temp_op);	// 문자열을 피연산자 스택에 삽입
+				token = pop(&s_operator);	// 토큰을 연산자 스택에 삽입
 			}
 			break;
-		default: // 피연산자
-			push(&s_operand, token);
+		default: // 피연산자일 경우
+			push(&s_operand, token);	// 토큰을 연산자 스택에 삽입
 			break;
 		}
 		token = get_token(exp);
 	}
 	while (!is_empty(&s_operator)) {// 스택에 저장된 연산자들 출력
-		op2 = pop(&s_operand);
-		op1 = pop(&s_operand);
+		op2 = pop(&s_operand);	// 스택에서 꺼낸 피연산자를 op2에 대입
+		op1 = pop(&s_operand);	// 스택에서 꺼낸 피연산자를 op1에 대입
 
-		temp_op = combine_3str(pop(&s_operator), op1, op2);
-		push(&s_operand, temp_op);
+		temp_op = combine_3str(pop(&s_operator), op1, op2);	// 연산자 피연산자 피연산자 순으로 이어지는 문자열 만듦
+		push(&s_operand, temp_op);	// 문자열을 피연산자 스택에 삽입
 	}
-	token = pop(&s_operand);
-	strcpy(temp, token);
-	free(token);
+	token = pop(&s_operand);		// 연산자 스택에 토큰을 꺼냄
+	strcpy(temp, token);	// 스택에 마지막으로 남아있던 문자열을 temp에 복사
+	free(token);	// 토큰 메모리 반환
 
-	len = strlen(temp);
-	p_prefix = (char*)malloc(len + 1);
-	strncpy(p_prefix, temp, len + 1);
-	return p_prefix;
+	len = strlen(temp);	// temp의 문자열 길이 저장
+	p_prefix = (char*)malloc(len + 1);	//
+	strncpy(p_prefix, temp, len + 1);	// len+1만큼 동적할당
+	free(temp);			// temp의 메모리 반환
+	return p_prefix;	// 전위식으로 변환된 문자열배열을 가리키는 주소값 반환
 }
 // 문자열 역순함수
 char* reverse_str(char* str)
 {
-	StackType s;
-	char* token, * exp_reverse;
-	int len;
+	StackType s;	// 스택 선언
+	char* token, * exp_reverse;	// 토큰을 담는 포인터 변수와 역순이 된 문자열을 담는 포인터 변수 선언
+	int len;	// 문자열의 길이를 담는 변수 선언
 
-	init_stack(&s);
+	init_stack(&s);	// 스택 초기화
 
-	len = strlen(str);
-	exp_reverse = (char*)malloc(len + 1);
-	exp_reverse[0] = '\0';
+	len = strlen(str);	// str문자열의 길이 저장
+	exp_reverse = (char*)malloc(len + 1);	// len+1만큼 동적 할당
+	exp_reverse[0] = '\0';	// 첫 문자를 NULL문자로 초기화
 
-	token = get_token(str);
-	while (token != NULL) {
-		push(&s, token);
-		token = get_token(str);
+	token = get_token(str);	// 문자열로 부터 토큰을 반환
+	while (token != NULL) {	// 토큰이 NULL일때까지 반복
+		push(&s, token);	// 스택에 토큰 삽입
+		token = get_token(str);	// 문자열로부터 토큰을 반환
 	}
-	while (!is_empty(&s)) {// 스택에 저장된 연산자들 출력
-		token = pop(&s);
-		strcat(exp_reverse, token);
+	while (!is_empty(&s)) {	// 스택이 빌때까지 반복
+		token = pop(&s);	// 스택에서 토큰 꺼냄
+		strcat(exp_reverse, token);	// 꺼낸 토큰을 exp_reverse에 이어붙임
 	}
-	return exp_reverse;
+	return exp_reverse;	// 역순이 된 문자열의 주소값 반환
 }
 // 전위 표기 수식 -> 중위 표기 수식 변환
 char* prefix_to_infix(char* exp)
 {
-	StackType s;
-	char* token, * exp_reverse, * op1, * op2, * temp;
-	int len;
+	StackType s;	// 스택 선언
+	char* token, * exp_reverse, * op1, * op2, * temp;	// 문자열토큰을 받을 포인터변수, 변환된 문자열을 담을 포인터변수 , 연산자문자열을 받을 포인터변수, 결합된 문자열을 임시로 담는 포인터 변수 선언
+	int len;	// 길이를 담는 변수 선언
 
-	init_stack(&s);
+	init_stack(&s);	// 스택 초기화
 
-	exp_reverse = reverse_str(exp);
+	exp_reverse = reverse_str(exp);	// 문자열을 역순으로 바꿈
 
-	token = get_token(exp_reverse);
-	while (token != NULL) {
+	token = get_token(exp_reverse);	// 역순이 된 문자열로부터 토큰 반환
+	while (token != NULL) {	// 토큰이 NULL일때까지 반복
 		switch (token[0]) {
-		case '+': case '-': case '*': case '/': // 연산자
-			op1 = pop(&s);
-			op2 = pop(&s);
+		case '+': case '-': case '*': case '/': // 토큰의 첫문자가 연산자일 경우
+			op1 = pop(&s);	// 스택 맨위에 있는 데이터 꺼내서 대입
+			op2 = pop(&s);	// 스택 맨위에 있는 데이터 꺼내서 대입	
 
-			temp = combine_3str_prec(op1, token, op2);
-			push(&s, temp);
+			temp = combine_3str_prec(op1, token, op2);	// 피연산자 연산자 피연산자 순으로 이어지는 문자열 만듦
+			push(&s, temp);	// 스택에 만들어진 문자열 삽입
 			break;
-		default: // 피연산자
-			push(&s, token);
+		default: // 토큰의 첫문자가 피연산자일 경우
+			push(&s, token);	// 스택에 토큰 삽입
 			break;
 		}
-		token = get_token(exp_reverse);
+		token = get_token(exp_reverse);	// 역순이 된 문자열로부터 토큰 반환
 	}
-	return pop(&s);
+	return pop(&s);	// 스택에 마지막으로 남아있던 데이터 반환
 }
 // 전위 표기 수식 -> 후위 표기 수식 변환
 char* prefix_to_postfix(char* exp)
 {
-	char* p;
-	p = prefix_to_infix(exp);
-	p = infix_to_postfix(p);
-	return p;
+	char* p;	// 문자열 포인터 선언
+	p = prefix_to_infix(exp);	// 매개변수로 전달받은 문자열을 전위식으로 변환
+	p = infix_to_postfix(p);	// 전위식으로 변환한 문자열을 후위식으로 변환
+	return p;	// 후위식으로 변환된 문자열 반환
 }
 // 후위 표기 수식 -> 중위 표기 수식 변환
 char* postfix_to_infix(char* exp)
 {
-	StackType s;
-	char* token, * exp_reverse, * op1, * op2, * temp;
-	int len;
+	StackType s;	// 스택 선언
+	char* token, * exp_reverse, * op1, * op2, * temp;	// 문자열토큰을 받을 포인터변수, 변환된 문자열을 담을 포인터변수 , 연산자문자열을 받을 포인터변수, 결합된 문자열을 임시로 담는 포인터 변수 선언
+	int len;	// 길이를 담는 변수 선언
 
-	init_stack(&s);
+	init_stack(&s);	// 스택 초기화
 
-	token = get_token(exp);
-	while (token != NULL) {
+	token = get_token(exp);	// 매개변수로 전달된 문자열로부터 토큰 반환
+	while (token != NULL) {	// 토큰이 NULL일때까지 반복
 		switch (token[0]) {
-		case '+': case '-': case '*': case '/': // 연산자
-			op2 = pop(&s);
-			op1 = pop(&s);
+		case '+': case '-': case '*': case '/':// 토큰의 첫문자가 연산자일 경우
+			op2 = pop(&s);	// 스택 맨위에 있는 데이터 꺼내서 대입
+			op1 = pop(&s);	// 스택 맨위에 있는 데이터 꺼내서 대입
 
-			temp = combine_3str_prec(op1, token, op2);
-			push(&s, temp);
+			temp = combine_3str_prec(op1, token, op2);	// 피연산자 연산자 피연산자 순으로 이어지는 문자열 만듦
+			push(&s, temp);	// 스택에 만들어진 문자열 삽입
 			break;
-		default: // 피연산자
-			push(&s, token);
+		default: // 토큰의 첫문자가 피연산자일 경우
+			push(&s, token);	// 스택에 토큰 삽입
 			break;
 		}
-		token = get_token(exp);
+		token = get_token(exp);	// 매개변수로 전달된 문자열로부터 토큰 반환
 	}
-	return pop(&s);
+	return pop(&s);	// 스택에 마지막으로 남아있던 데이터 반환
 }
 // 후위 표기 수식 -> 전위 표기 수식 변환
 char* postfix_to_prefix(char* exp)
 {
-	char* p;
-	p = postfix_to_infix(exp);
-	p = infix_to_prefix(p);
-	return p;
+	char* p;	// 문자열 포인터 선언
+	p = postfix_to_infix(exp);	// 매개변수로 전달받은 문자열을 전위식으로 변환
+	p = infix_to_prefix(p);		// 전위식으로 변환한 문자열을 후위식으로 변환
+	return p;	// 전위식으로 변환된 문자열 반환
 }
 // 후위 표기 수식 계산 함수
 double eval(char* exp)
 {
-	int len = strlen(exp);
-	double result, op1, op2;
-	char ch;
-	char* token, * tmp_1, * tmp_2;
-	StackType s;
-	init_stack(&s);
-	//for (i = 0; i < len; i++)
-	token = get_token(exp);
-	while (token != NULL) {
-		ch = token[0];
-		if (ch != '+' && ch != '-' && ch != '*' && ch != '/') {
+	int len = strlen(exp);	// 문자열 길이 저장
+	double result, op1, op2;	// 결과, 피연산자1, 피연산자2를 담는 double형 변수 선언
+	char ch;	// 연산자를 담는 문자 변수 선언
+	char* token, * tmp_1, * tmp_2;	// 토큰, 피연산자1, 피연산자2를 담는 문자열 포인터 변수 선언
+	StackType s;	// 스택 선언
+	init_stack(&s);	// 스택 초기화
+	token = get_token(exp);	// 매개변수로 전달된 문자열로부터 토큰 반환
+	while (token != NULL) {	// 토큰이 NULL이 될때까지 반복
+		ch = token[0];	// 토큰의 첫문자를 ch에 대입
+		if (ch != '+' && ch != '-' && ch != '*' && ch != '/') {	// ch가 사칙연산자가 아닐 경우 스택에 삽입
 			push(&s, token);
 		}
-		else { //연산자이면 피연산자를 스택에서 제거
+		else { //연산자이면 피연산자를 스택에서 두개 제거
 			tmp_1 = pop(&s);
 			tmp_2 = pop(&s);
+			// 꺼낸 피연산자를 double형으로 변환
 			op2 = token_to_double(tmp_1);
 			op1 = token_to_double(tmp_2);
+			// 사용한 토큰 메모리 반환
+			free(tmp_1);
+			free(tmp_2);
 			switch (ch) { //연산을 수행하고 스택에 저장
 			case '+':
+				// 피연산자 두개의 연산결과를 문자열로 변환후 스택에 삽입
 				token = double_to_token(op1 + op2);
 				push(&s, token);
 				break;
 			case '-':
+				// 피연산자 두개의 연산결과를 문자열로 변환후 스택에 삽입
 				token = double_to_token(op1 - op2);
 				push(&s, token);
 				break;
 			case '*':
+				// 피연산자 두개의 연산결과를 문자열로 변환후 스택에 삽입
 				token = double_to_token(op1 * op2);
 				push(&s, token);
 				break;
 			case '/':
-				if (op2 == 0) {
-					printf("0으로 나눌 수 없습니다.\n");
-					return 0;
+				if (op2 == 0) {	// 나누는 피연산자가 0일 경우 에러 메시지 출력 및 프로그램 종료
+					printf("cannot be divided by 0\n");
+					return 1;
 				}
-				token = double_to_token(op1 / op2);
+				token = double_to_token(op1 / op2);	// 피연산자 두개의 연산결과를 문자열로 변환
 				push(&s, token);
 				break;
 			}
 		}
-		token = get_token(exp);
+		token = get_token(exp);	// 매개변수로 전달된 문자열로부터 토큰 반환
 	}
-	token = pop(&s);
-	result = token_to_double(token);
-	free(token);
-	return result;
+	token = pop(&s);	// 스택에서 마지막 피연산자 제거
+	result = token_to_double(token);	// 문자열 토큰을 double형으로 변환
+	free(token);	// 토큰 메모리 반환
+	return result;	// 결과값 반환
 }
 
 
 
 
 
-int main(void)
+int main(void)		//Infix : (2 + 5) * 3 * (2 + 1) ,Prefix: * * + 2 5 3 + 2 1 , Postfix: 2 5 + 3 * 2 1 + *
 {
-	char* p_input = create_expr();	//  (235 + 5.2768)* 34 *    (2 +100)     3 + 2
-	char* p_post, * p_pre, * p_in;
-	int expr_type;
-	StackType s;
-	init_stack(&s);
+	char* p_input = create_expr();	// 사용자로 부터 수식을 입력받음
+	char* p_post, * p_pre, * p_in;	// 변환된 수식을 담을 문자열 포인터 변수 선언
+	int expr_type;	// 수식의 타입을 나타내는 변수
+	StackType s;	// 스택 선언
+	init_stack(&s);	// 스택 초기화
 
-	p_input = set_std_space(p_input);
-	//printf("%s \n", p_input);
-	// 식 검사
-	// 식 올바른지 검사 (+_* /.()숫자이외의 문자가 있는지)
-	if (check_opr_N_num(p_input) == 0) {
-		printf("올바르지않은 문자가 포함되어 있습니다.\n");
+	p_input = set_std_space(p_input);	// 수식의 공백문자 간격을 일정하게 조정
+	// 허용된 문자이외의 문자가 있는지 검사
+	if (!check_opr_N_num(p_input)) {
+		// 에러 메시지 출력 및 프로그램 종료
+		printf("Contains invalid characters\n");
 		return 1;
 	}
-	// 피연산자 개수 = 연산자 개수+1인지 검사					 123.34+12-3/4
-	if (is_op_num_correct(p_input) == 0) {
-		printf("연산자 피연산자 개수가 올바르지 않습니다.\n");
+	// 피연산자 개수 = 연산자 개수+1인지 검사
+	if (!is_op_num_correct(p_input)) {
+		// 에러 메시지 출력 및 프로그램 종료
+		printf("The number of operands and operators does not match ( Operand num != Operator num + 1 )\n");
 		return 1;
 	}
-	// 1-1.괄호검사
-	if (check_matching(p_input) == 0) {
-		printf("괄호 짝이 맞지 않습니다.\n");
+	// 괄호검사
+	if (!check_matching(p_input)) {
+		// 에러 메시지 출력 및 프로그램 종료
+		printf("Mismatched parenthesis\n");
 		return 1;
 	}
-	// 전위식 중위식 후위식 검사
+	// 전위식 중위식 후위식인지 검사
 	expr_type = return_expr_type(p_input);
+	// 수식의 타입에 따라 다른 수식으로 변환 및 계산
 	switch (expr_type) {
 	case 1: {	// 전위식
-		p_in = prefix_to_infix(p_input);
-		p_post = prefix_to_postfix(p_input);
+		p_in = prefix_to_infix(p_input);		// 중위식으로 변환
+		p_post = prefix_to_postfix(p_input);	// 후위식으로 변환
+		// 전위식, 중위식, 후위식 출력 및 계산값 출력
 		printf("Prefix:  %s \n", p_input);
 		printf("Infix: \t %s \n", p_in);
 		printf("Postfix: %s \n", p_post);
@@ -640,26 +650,28 @@ int main(void)
 		break;
 	}
 	case 2: {	// 중위식
-		p_pre = infix_to_prefix(p_input);
-		p_post = infix_to_postfix(p_input);
+		p_pre = infix_to_prefix(p_input);	// 전위식으로 변환
+		p_post = infix_to_postfix(p_input);	// 후위식으로 변환
+		// 전위식, 중위식, 후위식 출력 및 계산값 출력
 		printf("Prefix:  %s \n", p_pre);
 		printf("Infix: \t %s \n", p_input);
-		printf("Postfix: %s \n", p_post);	//Infix : (2 + 5) * 3 * (2 + 1) ,Prefix: 2 5 + 3 * 2 1 + * , Postfix: 2 5 + 3 * 2 1 + *
+		printf("Postfix: %s \n", p_post);	
 		printf("result = %lf\n", eval(p_post));
 		break;
 	}
 	case 3: {	// 후위식
-		p_in = postfix_to_infix(p_input);
-		p_pre = postfix_to_prefix(p_input);
+		p_in = postfix_to_infix(p_input);	// 중위식으로 변환
+		p_pre = postfix_to_prefix(p_input);	// 전위식으로 변환
+		// 전위식, 중위식, 후위식 출력 및 계산값 출력
 		printf("Prefix:  %s \n", p_pre);
 		printf("Infix: \t %s \n", p_in);
 		printf("Postfix: %s \n", p_input);
 		printf("result = %lf\n", eval(p_input));
 		break;
 	}
-	default: {
-		printf("올바르지 않은 식입니다.\n");
-		break;
+	default: {	// 위식에 포함되지 않을시 에러 메시지 출력 및 프로그램 종료
+		printf("Invalid expression\n");
+		return 1;
 	}
 	}
 
