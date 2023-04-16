@@ -72,25 +72,18 @@ char* get_op(char* s1, const char* delimit)
 }
 int main(void)
 {
-	char str[] = "(1+2)-3";
-	char* p;
+	char str[100] = "";
+	char str2[100] = "";
+	fgets(str, 100, stdin);
+	gets(str2);
+	int len = strlen(str);
+	int len2 = strlen(str2);
 
+	printf("len = %d, len2 = %d\n", len, len2);
+	str[len - 1] = '\0';
+	printf("len = %d, len2 = %d\n", len, len2);
 
-	char strd[100];
-	char* expr;
-	int n;
-	gets(strd);
-	printf("%d\n\n", strlen(strd));
-
-
-	remove_space(str);
-	printf("%s\n", str);
-
-	p = get_token(str);
-	while (p != NULL) {
-		printf("%s ", p);
-		p = get_token(str);
-	}
+	return 0;
 }
 
 #endif
